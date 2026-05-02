@@ -1,0 +1,6 @@
+pandas>=2.2
+scikit-learn>=1.5
+nltk>=3.9
+streamlit>=1.36
+pytest>=8.2
+protobuf>=6.33,<7
