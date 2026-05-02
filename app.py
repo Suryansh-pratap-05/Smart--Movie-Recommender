@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from html import escape
+
 import streamlit as st
 
 from src.recommender import MovieRecommender
@@ -154,6 +156,7 @@ def load_recommender() -> MovieRecommender:
 
 
 recommender = load_recommender()
+fallback_poster = recommender.poster_url("Smart Movie")
 
 st.markdown(
     """
@@ -209,14 +212,14 @@ with right:
                 st.markdown(
                     f"""
                     <article class="result-card">
-                        <img class="poster" src="{movie.poster_url}" alt="{movie.title} poster">
+                        <img class="poster" src="{movie.poster_url}" alt="{escape(movie.title)} poster" onerror="this.onerror=null;this.src='{fallback_poster}';">
                         <div>
-                            <h3>{rank}. {movie.title} <span style="color: rgba(255,248,236,0.55); font-weight: 400;">({movie.release_year})</span></h3>
-                            <p>{movie.overview}</p>
+                            <h3>{rank}. {escape(movie.title)} <span style="color: rgba(255,248,236,0.55); font-weight: 400;">({movie.release_year})</span></h3>
+                            <p>{escape(movie.overview)}</p>
                             <div class="chips">
                                 <span class="chip">Similarity {movie.similarity_score:.2f}</span>
                                 <span class="chip">Rating {movie.vote_average:.1f}/10</span>
-                                <span class="chip">{movie.genres}</span>
+                                <span class="chip">{escape(movie.genres)}</span>
                             </div>
                         </div>
                     </article>
@@ -239,8 +242,8 @@ with right:
             tiles.append(
                 f"""
                 <a class="poster-tile">
-                    <img src="{recommender.poster_url(title)}" alt="{title} poster">
-                    <span>{title}</span>
+                    <img src="{recommender.poster_url(title)}" alt="{escape(title)} poster" onerror="this.onerror=null;this.src='{fallback_poster}';">
+                    <span>{escape(title)}</span>
                 </a>
                 """
             )

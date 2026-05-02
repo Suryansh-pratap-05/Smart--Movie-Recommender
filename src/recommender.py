@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from difflib import get_close_matches
 from collections import Counter
+from base64 import b64encode
 import math
 from pathlib import Path
-from urllib.parse import quote
+from xml.sax.saxutils import escape as xml_escape
 
 import pandas as pd
 
@@ -118,7 +119,7 @@ class MovieRecommender:
         if title in POSTER_URLS:
             return POSTER_URLS[title]
 
-        safe_title = title.replace("&", "and").replace("<", "").replace(">", "")
+        safe_title = xml_escape(title[:30])
         svg = f"""
         <svg xmlns="http://www.w3.org/2000/svg" width="420" height="630" viewBox="0 0 420 630">
             <defs>
@@ -136,7 +137,8 @@ class MovieRecommender:
             <text x="34" y="578" fill="#fff8ee" font-family="Arial" font-size="18">Content-based match</text>
         </svg>
         """
-        return "data:image/svg+xml;charset=utf-8," + quote(svg)
+        encoded_svg = b64encode(svg.encode("utf-8")).decode("ascii")
+        return f"data:image/svg+xml;base64,{encoded_svg}"
 
     def find_best_title(self, movie_title: str) -> str | None:
         """Return exact or closest known movie title."""

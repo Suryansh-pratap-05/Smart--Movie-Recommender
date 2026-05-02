@@ -1,3 +1,5 @@
+from base64 import b64decode
+
 from src.recommender import MovieRecommender, get_recommendations
 
 
@@ -23,3 +25,14 @@ def test_guideline_helper_returns_titles():
 
     assert len(titles) == 4
     assert all(isinstance(title, str) for title in titles)
+
+
+def test_unknown_movie_poster_fallback_is_valid_svg_data_url():
+    poster_url = MovieRecommender.poster_url("Tenet")
+    prefix = "data:image/svg+xml;base64,"
+
+    assert poster_url.startswith(prefix)
+    decoded_svg = b64decode(poster_url.removeprefix(prefix)).decode("utf-8")
+    assert "<svg" in decoded_svg
+    assert "SMART PICK" in decoded_svg
+    assert "Tenet" in decoded_svg

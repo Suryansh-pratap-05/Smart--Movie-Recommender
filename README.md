@@ -43,8 +43,12 @@ Smart Movie Recommender/
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+
+If virtual environment creation fails on Windows with a `PermissionError` in
+`AppData\Local\Temp`, the project can still run with the system Python as long
+as the packages in `requirements.txt` are installed there.
 
 ## Prepare Dataset
 
@@ -59,7 +63,7 @@ This creates `data/movies_processed.csv`.
 Recommended Streamlit version:
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
 Open the local URL shown by Streamlit, usually `http://localhost:8501`.
