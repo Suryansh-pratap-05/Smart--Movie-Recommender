@@ -94,4 +94,4 @@ python -m pytest
 
 ## Author
 
-Created by Suryansh Pratap.
+Created by Suryansh Pratap singh.
