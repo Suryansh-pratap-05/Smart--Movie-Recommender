@@ -158,6 +158,42 @@ def load_recommender() -> MovieRecommender:
 recommender = load_recommender()
 fallback_poster = recommender.poster_url("Smart Movie")
 
+
+def poster_img(src: str, title: str) -> str:
+    safe_title = escape(title)
+    return (
+        f'<img src="{src}" alt="{safe_title} poster" '
+        f'onerror="this.onerror=null;this.src=\'{fallback_poster}\';">'
+    )
+
+
+def poster_tile(title: str) -> str:
+    return (
+        '<a class="poster-tile">'
+        f'{poster_img(recommender.poster_url(title), title)}'
+        f"<span>{escape(title)}</span>"
+        "</a>"
+    )
+
+
+def result_card(rank: int, movie) -> str:
+    return (
+        '<article class="result-card">'
+        f'{poster_img(movie.poster_url, movie.title).replace("<img ", "<img class=\"poster\" ", 1)}'
+        "<div>"
+        f'<h3>{rank}. {escape(movie.title)} '
+        f'<span style="color: rgba(255,248,236,0.55); font-weight: 400;">'
+        f"({movie.release_year})</span></h3>"
+        f"<p>{escape(movie.overview)}</p>"
+        '<div class="chips">'
+        f'<span class="chip">Similarity {movie.similarity_score:.2f}</span>'
+        f'<span class="chip">Rating {movie.vote_average:.1f}/10</span>'
+        f'<span class="chip">{escape(movie.genres)}</span>'
+        "</div>"
+        "</div>"
+        "</article>"
+    )
+
 st.markdown(
     """
     <section class="hero">
@@ -209,23 +245,7 @@ with right:
             st.success(f"Showing movies similar to: {matched_title}")
 
             for rank, movie in enumerate(recommendations, start=1):
-                st.markdown(
-                    f"""
-                    <article class="result-card">
-                        <img class="poster" src="{movie.poster_url}" alt="{escape(movie.title)} poster" onerror="this.onerror=null;this.src='{fallback_poster}';">
-                        <div>
-                            <h3>{rank}. {escape(movie.title)} <span style="color: rgba(255,248,236,0.55); font-weight: 400;">({movie.release_year})</span></h3>
-                            <p>{escape(movie.overview)}</p>
-                            <div class="chips">
-                                <span class="chip">Similarity {movie.similarity_score:.2f}</span>
-                                <span class="chip">Rating {movie.vote_average:.1f}/10</span>
-                                <span class="chip">{escape(movie.genres)}</span>
-                            </div>
-                        </div>
-                    </article>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                st.markdown(result_card(rank, movie), unsafe_allow_html=True)
     else:
         featured_titles = [
             "Inception",
@@ -237,18 +257,9 @@ with right:
             "Parasite",
             "Whiplash",
         ]
-        tiles = []
-        for title in featured_titles:
-            tiles.append(
-                f"""
-                <a class="poster-tile">
-                    <img src="{recommender.poster_url(title)}" alt="{escape(title)} poster" onerror="this.onerror=null;this.src='{fallback_poster}';">
-                    <span>{escape(title)}</span>
-                </a>
-                """
-            )
         st.info("Select a movie and click Recommend Movies, or try one of these poster-wall examples.")
-        st.markdown(f'<div class="poster-wall">{"".join(tiles)}</div>', unsafe_allow_html=True)
+        tiles = "".join(poster_tile(title) for title in featured_titles)
+        st.markdown(f'<div class="poster-wall">{tiles}</div>', unsafe_allow_html=True)
 
 st.divider()
 st.write(
